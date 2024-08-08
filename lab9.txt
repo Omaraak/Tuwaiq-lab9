@@ -1,0 +1,102 @@
+create database lab9;
+
+create table customer(
+    id varchar(10) primary key,
+    name varchar(20) not null unique ,
+    email varchar(21) not null unique ,
+    company_size int not null,
+    subscription_type varchar(7) not null
+);
+
+create table orders(
+    id varchar(10) primary key,
+    pick_up_location varchar(25) not null,
+    drop_of_location varchar(25) not null,
+    order_date datetime default current_timestamp,
+    est_time_of_delivery datetime,
+    order_status varchar(9) check ( order_status='received' or order_status='shipped' or 'completed' ),
+    customer_id varchar(10),
+    foreign key (customer_id) references customer(id)
+);
+
+create table driver(
+    id varchar(10) primary key,
+    name varchar(15),
+    contract_type varchar(10) check ( contract_type='long term' or contract_type='short term' ) not null,
+    price int not null,
+    age int check ( age>21 ),
+    experience int check ( experience>1 ),
+    number_of_orders int check ( number_of_orders>=10 ),
+    driver_status varchar(13) check ( driver_status='not available' or driver_status='available' ),
+    order_id varchar(10),
+    foreign key (order_id) references orders(id)
+);
+
+create table vehicle(
+    id varchar(10) primary key,
+    capacity int not null,
+    type varchar(9) check ( type='car' or type='plane' or type='container' ),
+    fuel_type varchar(6) check ( fuel_type='gas' or fuel_type='diesel'),
+    fuel_efficiency varchar(9) check ( fuel_efficiency='very good' or fuel_efficiency='good' or fuel_efficiency='okay' or fuel_efficiency='bad' or fuel_efficiency='very bad' ),
+    counter_kilometer int,
+    driver_id varchar(10),
+    foreign key (driver_id) references driver(id)
+);
+
+create table service(
+    id varchar(10) primary key,
+    service_date datetime default current_timestamp,
+    status varchar(6) check ( status='pass' or status='failed' ),
+    description varchar(100),
+    technician varchar(15),
+    price int check ( price>0 ),
+    company varchar(20),
+    branch varchar(16),
+    vehicle_id varchar(10),
+    foreign key (vehicle_id) references vehicle(id)
+);
+
+insert into customer values ('1','sami','sami@gmail.com',10,'standard');
+insert into customer values ('2','aramko','aramko@gmail.com',20,'standard');
+insert into customer values ('3','stc','stc@gmail.com',11,'deluxe');
+insert into customer values ('4','zain','zain@gmail.com',8,'deluxe');
+insert into customer values ('5','oska','oska@gmail.com',6,'standard');
+
+update customer set company_size = 1000 where id='1';
+delete from customer where id='2';
+
+insert into orders values ('1','riyadh','Uk','20240101','20240201','received','1');
+insert into orders values ('2','riyadh','UAE','20240101','20240201','completed','2');
+insert into orders values ('3','riyadh','USA','20240101','20240201','received','3');
+insert into orders values ('4','riyadh','france','20240101','20240201','received','4');
+insert into orders values ('5','riyadh','Uk','20240101','20240201','shipped','5');
+
+update orders set order_status = 'shipped' where id='1';
+delete from orders where id='2';
+
+insert into driver values ('1','omar','long term',500,25,4,10,'not available',1);
+insert into driver values ('2','sam','long term',10,30,4,10,'not available',2);
+insert into driver values ('3','ana','short term',40,25,4,10,'available',3);
+insert into driver values ('4','flats','long term',80,25,4,10,'available',4);
+insert into driver values ('5','jeff','short term',99,25,4,10,'available',5);
+
+update driver set driver_status = 'available' where id='1';
+delete from driver where id='2';
+
+insert into vehicle values ('1',10,'car','gas','good',120,'1');
+insert into vehicle values ('2',40,'car','diesel','bad',1100,'2');
+insert into vehicle values ('3',200,'car','gas','good',3000,'3');
+insert into vehicle values ('4',30,'car','diesel','bad',120,'4');
+insert into vehicle values ('5',90,'car','gas','good',550,'5');
+
+update vehicle set counter_kilometer = 10000 where id='1';
+delete from vehicle where id='2';
+
+insert into service values ('1','20240101','pass','','omar',100,'omar company','riyadh b1','1');
+insert into service values ('2','20240101','pass','','omar',200,'omar company','riyadh b1','2');
+insert into service values ('3','20240101','failed','','omar',100,'omar company','riyadh b1','3');
+insert into service values ('4','20240101','pass','','omar',200,'omar company','riyadh b1','4');
+insert into service values ('5','20240101','pass','','omar',10,'omar company','riyadh b1','5');
+
+update service set price = 2000 where id='1';
+delete from service where id='2';
